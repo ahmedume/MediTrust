@@ -1,0 +1,55 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# App data files (reports and generated PDFs)
+data/
+examples/pdfs/
+
+# Frontend dependencies and builds
+frontend/node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+
+# Local logs, caching, and editor configuration
+*.log
+*.pid
+.cache/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+data/
+
+start_backend.bat
+start_frontend.bat
+start_servers.vbs
+frontend-start.err.log
+frontend-start.log
+backend-start.err.log
+backend-start.log
+uv.lock
