@@ -27,8 +27,6 @@ env/
 *.pfx
 
 # App data files (reports and generated PDFs)
-data/
-examples/pdfs/
 
 # Frontend dependencies and builds
 frontend/node_modules/
