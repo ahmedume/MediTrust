@@ -1,1 +1,0 @@
-run = '''bash -lc "set -x; python --version; pip --version; pip install -r requirements.txt || { echo 'pip install failed'; exit 1; }; uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-3000}"'''
