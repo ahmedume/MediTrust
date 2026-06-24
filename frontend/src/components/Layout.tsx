@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex w-full max-w-[1600px] flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-2 text-base font-semibold tracking-tight sm:text-lg lg:text-xl">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-accent/30 bg-accent/20 text-xs text-accent-soft sm:h-8 sm:w-8 sm:text-sm lg:h-9 lg:w-9 lg:text-sm">
-              ML
+              MT
             </span>
             MediTrust
           </Link>
