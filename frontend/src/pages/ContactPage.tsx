@@ -15,12 +15,12 @@ export default function ContactPage() {
         <div className="space-y-6 rounded-2xl p-5 sm:p-8 lg:rounded-3xl lg:p-8 glass">
           <div className="grid gap-3 text-base text-slate-400 sm:grid-cols-2 lg:text-base">
             <p>
-              Email: <span className="text-white">team@meditrust.app</span>
+              Email: <span className="text-white">ahmedumeranwer@gmail.com</span>
             </p>
             <p>
               GitHub:{" "}
               <a href="https://github.com" className="text-accent-soft hover:underline">
-                github.com/meditrust
+                github.com/ahmedume
               </a>
             </p>
           </div>
