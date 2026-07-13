@@ -1,6 +1,12 @@
 # MediTrust
 
-MediTrust is a full-stack medical literature intelligence platform. It combines PubMed literature retrieval with **RAG (Retrieval-Augmented Generation)** over user-uploaded PDFs to produce structured evidence reports, trust-scored article evaluations, and interactive document Q&A.
+<p align="center">
+  <strong>Medical literature intelligence platform</strong><br>
+  PubMed retrieval → trust-scored evidence → structured reports → document Q&A
+</p>
+
+> [!IMPORTANT]
+> MediTrust is for research review only. **Not medical advice.**
 
 ## Features
 
@@ -15,11 +21,14 @@ MediTrust is a full-stack medical literature intelligence platform. It combines 
 
 ## Tech Stack
 
-- Backend: Python, FastAPI, Pydantic, LangChain, ChromaDB, HuggingFace Embeddings
-- Frontend: React, TypeScript, Vite, Tailwind CSS, Framer Motion, Three.js
-- Data: PubMed / NCBI E-utilities + user-uploaded PDFs
-- LLM: Groq Cloud (`llama-3.3-70b-versatile`) via LangChain
-- Vector DB: Chroma (persistent, on-disk)
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python, FastAPI, Pydantic, LangChain |
+| Frontend | React, TypeScript, Vite, Tailwind CSS, Framer Motion |
+| LLM | Groq Cloud (`llama-3.3-70b-versatile`) via LangChain |
+| Vector DB | Chroma (persistent, on-disk) |
+| Embeddings | HuggingFace `all-MiniLM-L6-v2` |
+| Data Sources | PubMed / NCBI E-utilities + user-uploaded PDFs |
 
 ## Getting Started
 
@@ -27,6 +36,7 @@ MediTrust is a full-stack medical literature intelligence platform. It combines 
 
 - Python 3.11+
 - Node.js 18+
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
 
 ### Backend
 
@@ -51,26 +61,30 @@ npm run dev
 ```
 
 Open the app at `http://localhost:5173`.
-
-API documentation is available at `http://localhost:8000/docs`.
+API documentation at `http://localhost:8000/docs`.
 
 ## Environment
 
 Create a `.env` file from `.env.example` and configure the variables below.
 
 ```env
+# Required for LLM enrichment (optional — deterministic fallback if omitted)
 GROQ_API_KEY=
 GROQ_MODEL=llama-3.3-70b-versatile
 GROQ_SUGGEST_MODEL=llama-3.1-8b-instant
+
+# Data directories
 REPORTS_DIR=data/reports
 PDF_DIR=data/pdfs
 VECTOR_STORE_DIR=data/vector_store
 RAG_UPLOAD_DIR=data/uploads
+
+# Optional
 FRONTEND_URL=
 PORT=8000
 ```
 
-A `GROQ_API_KEY` enables LLM enrichment (plain-language summaries, contradiction detection, chatbot). The pipeline works without it — scoring falls back to deterministic heuristics. Get a key at [console.groq.com](https://console.groq.com).
+Get a Groq API key at [console.groq.com](https://console.groq.com).
 
 ## RAG Architecture
 
@@ -86,6 +100,27 @@ Upload PDF → Parse text (PyPDF) → Chunk (800 chars, 100 overlap)
 ```
 User question → Embed query → Chroma similarity search (top 8)
 → Format context with source citations → Groq LLM → Answer + cited sources
+```
+
+## Project Structure
+
+```
+backend/
+  app/
+    agents/         # LLM pipeline stages (research, evaluation, structuring, PDF)
+    rag/            # RAG ingestion, vector store, chat chain
+    routers/        # FastAPI route handlers
+    services/       # PubMed, trust scoring, suggestions
+    config.py       # Pydantic settings (loaded from .env)
+    main.py         # FastAPI app entrypoint
+    models.py       # Shared Pydantic models
+    store.py        # In-memory report/status store
+frontend/
+  src/
+    api.ts          # API client
+    components/     # Reusable UI components
+    pages/          # Route pages (HomePage, ResultsPage, SearchPage, etc.)
+    three/          # 3D scene components
 ```
 
 ## API Endpoints
@@ -105,11 +140,7 @@ User question → Embed query → Chroma similarity search (top 8)
 ## Notes
 
 - Do not commit `.env`, generated reports, virtual environments, or dependency folders.
-- The backend exposes OpenAPI docs at `/docs`.
-- The frontend serves from Vite and communicates with the backend via the `/api` proxy.
 - Dependencies are managed with `uv` — use `uv sync` to install, not pip directly.
 - The vector store persists in `data/vector_store/` between restarts.
-
-## Disclaimer
-
-MediTrust is intended for research review and literature summarization. It is not medical advice and should not be used as a substitute for professional clinical judgment.
+- The backend exposes OpenAPI docs at `/docs`.
+- The frontend serves from Vite and communicates with the backend via the `/api` proxy.
