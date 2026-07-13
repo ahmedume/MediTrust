@@ -6,12 +6,11 @@ MediTrust is a full-stack medical literature intelligence platform. It combines 
 
 - **PubMed Literature Search** — Retrieve articles via NCBI E-utilities with clinical query expansion
 - **Trust Scoring** — Evidence quality scored by study design, source credibility, sample size, and recency
-- **LLM Enrichment** — Plain-language summaries, bias notes, contradiction detection (Groq via LangChain)
+- **LLM Enrichment** — Plain-language summaries, bias notes, contradiction detection (Groq via LangChain; falls back to deterministic scoring if unavailable)
 - **PDF Evidence Reports** — Downloadable styled reports with verdicts, tables, and score breakdowns
 - **RAG Document Upload** — Upload your own PDFs; the system chunks, embeds, and indexes them into ChromaDB
 - **Evidence Assessment** — Each uploaded PDF receives an automated evidence quality score (0–100)
 - **RAG Chatbot** — Ask questions against uploaded PDFs with cited source excerpts
-- **3D Cinematic Landing** — Scroll-driven Three.js visualisation with device-tier fallback
 - **Responsive Dashboard** — Pipeline status, results review, trust breakdown charts
 
 ## Tech Stack
@@ -35,11 +34,11 @@ MediTrust is a full-stack medical literature intelligence platform. It combines 
 cd meditrust
 uv sync
 copy .env.example .env
-# Edit .env and add your GROQ_API_KEY (optional)
+# Edit .env and add your GROQ_API_KEY (optional — pipeline falls back without it)
 uv run uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 ```
- 
- Or run `start_backend.bat`.
+
+Or run `start_backend.bat`.
 
 ### Frontend
 
@@ -71,7 +70,7 @@ FRONTEND_URL=
 PORT=8000
 ```
 
-A `GROQ_API_KEY` is required for evidence assessment, LLM enrichment, and RAG chatbot responses. Get one at [console.groq.com](https://console.groq.com).
+A `GROQ_API_KEY` enables LLM enrichment (plain-language summaries, contradiction detection, chatbot). The pipeline works without it — scoring falls back to deterministic heuristics. Get a key at [console.groq.com](https://console.groq.com).
 
 ## RAG Architecture
 
