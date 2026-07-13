@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.routers.api import router as api_router
+from backend.app.routers.rag_api import router as rag_router
 from backend.app.config import get_settings
 
 settings = get_settings()
@@ -16,10 +17,6 @@ ALLOWED_ORIGINS = [
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
-    os.environ.get(
-        "FRONTEND_URL",
-        "https://meditrust-99z5cu8q6-ahmedumes-projects.vercel.app",
-    ),
 ]
 
 app.add_middleware(
@@ -31,6 +28,7 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
+app.include_router(rag_router)
 
 
 @app.get("/")

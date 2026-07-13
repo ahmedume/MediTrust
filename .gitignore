@@ -26,7 +26,8 @@ env/
 *.p12
 *.pfx
 
-# App data files (reports and generated PDFs)
+# App data files (reports, uploads, vector store, generated PDFs)
+data/
 
 # Frontend dependencies and builds
 frontend/node_modules/
@@ -44,13 +45,10 @@ frontend/tsconfig.tsbuildinfo
 .idea/
 .DS_Store
 Thumbs.db
-data/
 
-start_backend.bat
-start_frontend.bat
+# Startup artifacts (not the scripts themselves)
 start_servers.vbs
 frontend-start.err.log
 frontend-start.log
 backend-start.err.log
 backend-start.log
-uv.lock

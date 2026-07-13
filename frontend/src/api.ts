@@ -1,7 +1,14 @@
-import type { PipelineStatus, SearchReport } from "./types";
+import type {
+  PipelineStatus,
+  SearchReport,
+  RAGDocument,
+  RAGChatResponse,
+  RAGUploadResponse,
+} from "./types";
 
-// Fall back to localhost only if the environment variable isn't set
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+// Use relative path so Vite proxy handles it; fallback for direct access
+const API = import.meta.env.VITE_API_URL || "/api";
+const RAG_API = `${API}/rag`;
 
 export async function fetchSuggestions(q: string): Promise<string[]> {
   const res = await fetch(`${API}/suggestions?q=${encodeURIComponent(q)}`);
@@ -30,4 +37,40 @@ export async function fetchReport(
 
 export function pdfDownloadUrl(reportId: string): string {
   return `${API}/download/${reportId}`;
+}
+
+// --- RAG API ---
+
+export async function uploadPDF(file: File): Promise<RAGUploadResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(`${RAG_API}/upload`, { method: "POST", body: form });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail || "Upload failed");
+  }
+  return res.json();
+}
+
+export async function fetchRAGDocuments(): Promise<RAGDocument[]> {
+  const res = await fetch(`${RAG_API}/documents`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function deleteRAGDocument(docId: string): Promise<void> {
+  await fetch(`${RAG_API}/documents/${docId}`, { method: "DELETE" });
+}
+
+export async function chatWithPDF(
+  question: string,
+  docId?: string
+): Promise<RAGChatResponse> {
+  const res = await fetch(`${RAG_API}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, doc_id: docId || null }),
+  });
+  if (!res.ok) throw new Error("Chat failed");
+  return res.json();
 }

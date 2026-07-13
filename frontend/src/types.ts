@@ -53,3 +53,39 @@ export interface PipelineStatus {
   message: string;
   progress: number;
 }
+
+// --- RAG types ---
+
+export interface RAGDocument {
+  doc_id: string;
+  filename: string;
+  page_count: number;
+  chunk_count: number;
+  uploaded_at: string;
+  evidence_score: number | null;
+  evidence_explanation: string;
+}
+
+export interface RAGChatSource {
+  content: string;
+  filename: string;
+  page: number | null;
+  score: number | null;
+}
+
+export interface RAGChatResponse {
+  answer: string;
+  sources: RAGChatSource[];
+}
+
+export interface RAGUploadResponse {
+  doc_id: string;
+  filename: string;
+  page_count: number;
+  chunk_count: number;
+  uploaded_at: string;
+  evidence_score: number | null;
+  evidence_explanation: string;
+  evidence_strengths: string[];
+  evidence_weaknesses: string[];
+}

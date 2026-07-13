@@ -1,23 +1,26 @@
 # MediTrust
 
-MediTrust is a full-stack medical literature review platform that converts clinical research questions into structured evidence reports. It retrieves PubMed articles, evaluates evidence quality with transparent scoring, summarizes consensus and contradictions, and exports PDF summaries.
+MediTrust is a full-stack medical literature intelligence platform. It combines PubMed literature retrieval with **RAG (Retrieval-Augmented Generation)** over user-uploaded PDFs to produce structured evidence reports, trust-scored article evaluations, and interactive document Q&A.
 
 ## Features
 
-- Search PubMed using NCBI E-utilities
-- Expand clinical queries for broader literature retrieval
-- Score article quality by study design, source credibility, sample size, and recency
-- Plain-language topic explanations powered by Groq
-- Identify consensus, contradictions, and uncertainty across abstracts
-- Generate downloadable PDF evidence reports
-- Responsive React dashboard with search, pipeline status, results review, and downloads
+- **PubMed Literature Search** — Retrieve articles via NCBI E-utilities with clinical query expansion
+- **Trust Scoring** — Evidence quality scored by study design, source credibility, sample size, and recency
+- **LLM Enrichment** — Plain-language summaries, bias notes, contradiction detection (Groq via LangChain)
+- **PDF Evidence Reports** — Downloadable styled reports with verdicts, tables, and score breakdowns
+- **RAG Document Upload** — Upload your own PDFs; the system chunks, embeds, and indexes them into ChromaDB
+- **Evidence Assessment** — Each uploaded PDF receives an automated evidence quality score (0–100)
+- **RAG Chatbot** — Ask questions against uploaded PDFs with cited source excerpts
+- **3D Cinematic Landing** — Scroll-driven Three.js visualisation with device-tier fallback
+- **Responsive Dashboard** — Pipeline status, results review, trust breakdown charts
 
 ## Tech Stack
 
-- Backend: Python, FastAPI, Pydantic, httpx, ReportLab
-- Frontend: React, TypeScript, Vite, Tailwind CSS
-- Data: PubMed / NCBI E-utilities
-- Optional LLM: Groq via LangChain
+- Backend: Python, FastAPI, Pydantic, LangChain, ChromaDB, HuggingFace Embeddings
+- Frontend: React, TypeScript, Vite, Tailwind CSS, Framer Motion, Three.js
+- Data: PubMed / NCBI E-utilities + user-uploaded PDFs
+- LLM: Groq Cloud (`llama-3.3-70b-versatile`) via LangChain
+- Vector DB: Chroma (persistent, on-disk)
 
 ## Getting Started
 
@@ -30,12 +33,10 @@ MediTrust is a full-stack medical literature review platform that converts clini
 
 ```powershell
 cd meditrust
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+uv sync
 copy .env.example .env
 # Edit .env and add your GROQ_API_KEY (optional)
-uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
+uv run uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Or run `start_backend.bat`.
@@ -64,15 +65,51 @@ GROQ_MODEL=llama-3.3-70b-versatile
 GROQ_SUGGEST_MODEL=llama-3.1-8b-instant
 REPORTS_DIR=data/reports
 PDF_DIR=data/pdfs
+VECTOR_STORE_DIR=data/vector_store
+RAG_UPLOAD_DIR=data/uploads
+FRONTEND_URL=
+PORT=8000
 ```
 
-The `GROQ_API_KEY` is optional. Without it, MediTrust uses PubMed retrieval with deterministic scoring and local fallbacks. With a key, Groq enriches topic summaries, bias notes, and contradiction detection.
+A `GROQ_API_KEY` is required for evidence assessment, LLM enrichment, and RAG chatbot responses. Get one at [console.groq.com](https://console.groq.com).
+
+## RAG Architecture
+
+### Ingestion Pipeline
+
+```
+Upload PDF → Parse text (PyPDF) → Chunk (800 chars, 100 overlap)
+→ Embed (all-MiniLM-L6-v2) → Index in ChromaDB → LLM evidence assessment
+```
+
+### Retrieval Pipeline
+
+```
+User question → Embed query → Chroma similarity search (top 8)
+→ Format context with source citations → Groq LLM → Answer + cited sources
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/health` | Health check |
+| `GET` | `/api/suggestions?q=` | Search suggestions |
+| `POST` | `/api/search` | Start PubMed literature review |
+| `GET` | `/api/report/{id}` | Poll report status / get result |
+| `GET` | `/api/download/{id}` | Download PDF report |
+| `POST` | `/api/rag/upload` | Upload PDF for RAG ingestion |
+| `GET` | `/api/rag/documents` | List uploaded documents |
+| `DELETE` | `/api/rag/documents/{id}` | Delete uploaded document |
+| `POST` | `/api/rag/chat` | Ask question against uploaded PDF |
 
 ## Notes
 
 - Do not commit `.env`, generated reports, virtual environments, or dependency folders.
 - The backend exposes OpenAPI docs at `/docs`.
 - The frontend serves from Vite and communicates with the backend via the `/api` proxy.
+- Dependencies are managed with `uv` — use `uv sync` to install, not pip directly.
+- The vector store persists in `data/vector_store/` between restarts.
 
 ## Disclaimer
 

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 const links = [
   { to: "/", label: "Home" },
   { to: "/search", label: "Research" },
+  { to: "/upload", label: "Upload" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
