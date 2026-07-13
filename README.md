@@ -38,8 +38,8 @@ copy .env.example .env
 # Edit .env and add your GROQ_API_KEY (optional)
 uv run uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 ```
-
-Or run `start_backend.bat`.
+ 
+ Or run `start_backend.bat`.
 
 ### Frontend
 

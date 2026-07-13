@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timezone
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -93,8 +94,10 @@ async def run_structuring_agent(
             ("human", "{query}"),
         ])
         topic_chain = topic_prompt | llm | StrOutputParser()
-        topic_summary = await topic_chain.ainvoke({"query": query})
-    except (ValueError, TimeoutError):
+        topic_summary = await asyncio.wait_for(
+            topic_chain.ainvoke({"query": query}), timeout=15.0,
+        )
+    except Exception:
         topic_summary = ""
 
     contradictions: list[ContradictionCluster] = []
@@ -103,7 +106,9 @@ async def run_structuring_agent(
         llm = get_llm()
         parser = PydanticOutputParser(pydantic_object=ReportSynthesis)
         chain = SYNTH_PROMPT.partial(format_instructions=parser.get_format_instructions()) | llm | parser
-        synth = await chain.ainvoke({"query": query, "articles_json": articles_json})
+        synth = await asyncio.wait_for(
+            chain.ainvoke({"query": query, "articles_json": articles_json}), timeout=15.0,
+        )
         if synth.verdict:
             verdict = synth.verdict
         if synth.summary:
@@ -112,7 +117,7 @@ async def run_structuring_agent(
             breakdown = synth.trust_breakdown
         if synth.contradictions:
             contradictions = synth.contradictions
-    except (ValueError, TimeoutError):
+    except Exception:
         high = [a for a in articles if a.trust_score >= 80]
         low = [a for a in articles if a.trust_score < 60]
         if high and low:

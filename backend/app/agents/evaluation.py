@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from backend.app.agents.llm import get_llm
@@ -58,15 +59,18 @@ async def _evaluate_one(article: RawArticle) -> EvaluatedArticle:
         llm = get_llm()
         parser = PydanticOutputParser(pydantic_object=ArticleEvalLLM)
         chain = EVAL_PROMPT.partial(format_instructions=parser.get_format_instructions()) | llm | parser
-        enriched = await chain.ainvoke(
-            {
-                "title": article.title,
-                "source": article.source,
-                "year": article.year or "unknown",
-                "abstract": article.abstract or "N/A",
-                "trust_score": trust_score,
-                "study_type": study_type,
-            }
+        enriched = await asyncio.wait_for(
+            chain.ainvoke(
+                {
+                    "title": article.title,
+                    "source": article.source,
+                    "year": article.year or "unknown",
+                    "abstract": article.abstract or "N/A",
+                    "trust_score": trust_score,
+                    "study_type": study_type,
+                }
+            ),
+            timeout=15.0,
         )
         return EvaluatedArticle(
             title=base.title,
@@ -80,7 +84,7 @@ async def _evaluate_one(article: RawArticle) -> EvaluatedArticle:
             url=base.url,
             pmid=base.pmid,
         )
-    except (ValueError, TimeoutError):
+    except Exception:
         return base
 
 
