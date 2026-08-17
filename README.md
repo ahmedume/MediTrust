@@ -144,3 +144,13 @@ frontend/
 - The vector store persists in `data/vector_store/` between restarts.
 - The backend exposes OpenAPI docs at `/docs`.
 - The frontend serves from Vite and communicates with the backend via the `/api` proxy.
+
+
+## Screenshots
+<img width="1890" height="855" alt="meditrust" src="https://github.com/user-attachments/assets/40b5c0fb-a1ba-492d-ab46-8c74a9347ecb" />
+
+<img width="1906" height="772" alt="meditrust (2)" src="https://github.com/user-attachments/assets/a8dd5ca1-58b0-44e0-a2b0-a9a9164839ca" />
+
+<img width="1885" height="857" alt="meditrust (3)" src="https://github.com/user-attachments/assets/74c360cd-9526-4072-9d1a-c97a1e35ff34" />
+
+
